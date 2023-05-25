@@ -64,7 +64,20 @@ async function run() {
 
     // services
     app.get("/services", async (req, res) => {
-      const cursor = serviceCollection.find();
+      const sort = req.query.sort;
+      const search = req.query.search;
+      const query = { title: { $regex: search, $options: "i" } };
+      // console.log(search);
+      // const query = {};
+      // const query = { price: { $gte: 150 } };
+      // const query = { price: { $gt: 100 } };
+      // const query = { price: { $lt: 100 } };
+      const options = {
+        sort: {
+          price: sort === "asc" ? 1 : -1,
+        },
+      };
+      const cursor = serviceCollection.find(query, options);
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -96,6 +109,7 @@ async function run() {
       const result = await bookingsCollection.find(query).toArray();
       res.send(result);
     });
+
     // create
     app.post("/bookings", async (req, res) => {
       const booking = req.body;
